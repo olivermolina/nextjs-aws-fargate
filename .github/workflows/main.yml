@@ -64,47 +64,56 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+      - name: Docker Login to Amazon ECR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ steps.login-ecr.outputs.registry }}
+          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: lunahealthapp
-          IMAGE_TAG: ${{ github.sha }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          STYTCH_PROJECT_ENV: ${{ secrets.STYTCH_PROJECT_ENV }}
-          STYTCH_PROJECT_ID: ${{ secrets.STYTCH_PROJECT_ID }}
-          NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN: ${{ secrets.NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN }}
-          CUSTOMER_IO_API_KEY: ${{ secrets.CUSTOMER_IO_API_KEY }}
-          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
-          AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
-          QSTASH_URL: ${{ secrets.QSTASH_URL }}
-          QSTASH_TOKEN: ${{ secrets.QSTASH_TOKEN }}
-          QSTASH_CURRENT_SIGNING_KEY: ${{ secrets.QSTASH_CURRENT_SIGNING_KEY }}
-          QSTASH_NEXT_SIGNING_KEY: ${{ secrets.QSTASH_NEXT_SIGNING_KEY }}
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-          NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID }}
-          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
-          PUSHER_APP_SECRET: ${{ secrets.PUSHER_APP_SECRET }}
-          NEXT_PUBLIC_PUSHER_APP_KEY: ${{ secrets.NEXT_PUBLIC_PUSHER_APP_KEY }}
-          NEXT_PUBLIC_PUSHER_APP_CLUSTER: ${{ secrets.NEXT_PUBLIC_PUSHER_APP_CLUSTER }}
-          NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          WHO_ICD_API_CLIENT_ID: ${{ secrets.WHO_ICD_API_CLIENT_ID }}
-          WHO_ICD_API_CLIENT_SECRET: ${{ secrets.WHO_ICD_API_CLIENT_SECRET }}
-          DAILY_API_KEY: ${{ secrets.DAILY_API_KEY }}
-          DAILY_REST_DOMAIN: ${{ secrets.DAILY_REST_DOMAIN }}
-          MESSAGEBIRD_API_KEY : ${{ secrets.MESSAGEBIRD_API_KEY  }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          tags: "lunahealthapp/{{ github.sha }}, lunahealthapp:latest"
+          secrets: |
+            "DATABASE_URL=${{ secrets.DATABASE_URL }}"
+            "STYTCH_PROJECT_ENV=${{ secrets.STYTCH_PROJECT_ENV }}"
+            "STYTCH_PROJECT_ID=${{ secrets.STYTCH_PROJECT_ID }}"
+            "NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN=${{ secrets.NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN }}"
+            "CUSTOMER_IO_API_KEY=${{ secrets.CUSTOMER_IO_API_KEY }}"
+            "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}"
+            "SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}"
+            "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}"
+            "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+            "AWS_S3_REGION=${{ secrets.AWS_S3_REGION }}"
+            "AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}"
+            "QSTASH_URL=${{ secrets.QSTASH_URL }}"
+            "QSTASH_TOKEN=${{ secrets.QSTASH_TOKEN }}"
+            "QSTASH_CURRENT_SIGNING_KEY=${{ secrets.QSTASH_CURRENT_SIGNING_KEY }}"
+            "QSTASH_NEXT_SIGNING_KEY=${{ secrets.QSTASH_NEXT_SIGNING_KEY }}"
+            "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}"
+            "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}"
+            "STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}"
+            "NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID=${{ secrets.NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID }}"
+            "PUSHER_APP_ID=${{ secrets.PUSHER_APP_ID }}"
+            "PUSHER_APP_SECRET=${{ secrets.PUSHER_APP_SECRET }}"
+            "NEXT_PUBLIC_PUSHER_APP_KEY=${{ secrets.NEXT_PUBLIC_PUSHER_APP_KEY }}"
+            "NEXT_PUBLIC_PUSHER_APP_CLUSTER=${{ secrets.NEXT_PUBLIC_PUSHER_APP_CLUSTER }}"
+            "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}"
+            "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}"
+            "WHO_ICD_API_CLIENT_ID=${{ secrets.WHO_ICD_API_CLIENT_ID }}"
+            "WHO_ICD_API_CLIENT_SECRET=${{ secrets.WHO_ICD_API_CLIENT_SECRET }}"
+            "DAILY_API_KEY=${{ secrets.DAILY_API_KEY }}"
+            "DAILY_REST_DOMAIN=${{ secrets.DAILY_REST_DOMAIN }}"
+            "MESSAGEBIRD_API_KEY=${{ secrets.MESSAGEBIRD_API_KEY }}"
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
