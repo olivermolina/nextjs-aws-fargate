@@ -60,8 +60,11 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          tags: lunahealthapp:latest
           push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/lunahealthapp:${{ steps.sha_short.outputs.sha_short }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          provenance: false
           build-args: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             STYTCH_PROJECT_ENV=${{ secrets.STYTCH_PROJECT_ENV }}
