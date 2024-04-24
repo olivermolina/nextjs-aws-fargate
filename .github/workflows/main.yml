@@ -58,10 +58,14 @@ jobs:
 
       - name: Build, tag, and push image to Amazon ECR
         uses: docker/build-push-action@v5
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: lunahealthapp
+          IMAGE_TAG: ${{ github.sha }}
         with:
           context: .
           push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/lunahealthapp:${{ steps.sha_short.outputs.sha_short }}
+          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           provenance: false
