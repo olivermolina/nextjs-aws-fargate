@@ -13,9 +13,6 @@ COPY package.json yarn.lock ./
 # Install dependencies
 RUN yarn install --frozen-lockfile
 
-# Copy the rest of your app's source code from your host to your image filesystem.
-COPY . .
-
 # Specify the variable you need
 ARG NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN
 ENV NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN=${NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN}
@@ -81,7 +78,6 @@ ARG DAILY_API_KEY
 ENV DAILY_API_KEY=${DAILY_API_KEY}
 ARG DAILY_REST_DOMAIN
 ENV DAILY_REST_DOMAIN=${DAILY_REST_DOMAIN}
-
 ENV GENERATE_SOURCEMAP false
 
 RUN touch .env
@@ -121,6 +117,9 @@ RUN echo "DAILY_API_KEY=${DAILY_API_KEY}" >> .env.production
 RUN echo "DAILY_REST_DOMAIN=${DAILY_REST_DOMAIN}" >> .env
 
 RUN cat .env
+
+# Copy the rest of your app's source code from your host to your image filesystem.
+COPY . .
 
 # Build your Next.js app
 RUN yarn build
