@@ -10,9 +10,6 @@ RUN apk add --no-cache chromium
 # Copy package.json and yarn.lock to the working directory
 COPY package.json yarn.lock ./
 
-RUN yarn config set registry http://registry.npmmirror.com
-RUN yarn cache clean
-
 # Install dependencies
 RUN yarn install --production
 
