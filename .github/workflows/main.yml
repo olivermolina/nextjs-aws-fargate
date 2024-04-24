@@ -142,6 +142,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: lunahealthapp-service
-          cluster: lunahealthapp-cluster-node
+          service: web-nodejs
+          cluster: web-cluster-node
           wait-for-service-stability: true
