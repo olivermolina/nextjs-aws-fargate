@@ -62,6 +62,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           tags: lunahealthapp:latest
+          push: true
           secrets: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             STYTCH_PROJECT_ENV=${{ secrets.STYTCH_PROJECT_ENV }}
