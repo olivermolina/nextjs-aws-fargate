@@ -21,7 +21,6 @@ jobs:
       - run: yarn install --frozen-lockfile
       - name: yarn build with env
         env: # Or as an environment variable
-          NODE_ENV: ${{ secrets.NODE_ENV }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           STYTCH_PROJECT_ENV: ${{ secrets.STYTCH_PROJECT_ENV }}
           STYTCH_PROJECT_ID: ${{ secrets.STYTCH_PROJECT_ID }}
@@ -70,7 +69,6 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: lunahealthapp
           IMAGE_TAG: ${{ github.sha }}
-          NODE_ENV: ${{ secrets.NODE_ENV }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           STYTCH_PROJECT_ENV: ${{ secrets.STYTCH_PROJECT_ENV }}
           STYTCH_PROJECT_ID: ${{ secrets.STYTCH_PROJECT_ID }}
