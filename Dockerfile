@@ -2,7 +2,9 @@
 FROM node:20.12.0-alpine3.19
 
 # Set the working directory in the container
-WORKDIR /usr/src/app
+RUN mkdir -p /opt/app
+
+WORKDIR /opt/app
 
 # Install Chromium
 RUN apk add --no-cache chromium
@@ -83,10 +85,28 @@ ARG DAILY_REST_DOMAIN
 ENV DAILY_REST_DOMAIN=${DAILY_REST_DOMAIN}
 
 ENV GENERATE_SOURCEMAP=false
+ENV NODE_ENV production
+ENV PORT 80
+ENV NEXT_TELEMETRY_DISABLED 1
 
 # Build your Next.js app
 RUN yarn build
 
-# The command to run your app
-CMD ["yarn", "start"]
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
 
+# You only need to copy next.config.js if you are NOT using the default configuration
+#COPY /app/next.config.js ./
+COPY ./public /opt/app/public
+COPY --chown=nextjs:nodejs ./.next /opt/app/.next
+COPY ./node_modules /opt/app/node_modules
+COPY ./package.json /opt/app/package.json
+COPY ./start.sh /opt/app/start.sh
+RUN chmod +x /opt/app/start.sh
+
+USER nextjs
+
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# The command to run your app
+ENTRYPOINT ["/opt/app/start.sh"]
