@@ -99,7 +99,7 @@ RUN adduser -S nextjs -u 1001
 #COPY /app/next.config.js ./
 COPY ./public /opt/app/public
 COPY --chown=nextjs:nodejs ./.next /opt/app/.next
-COPY ./node_modules /opt/app/node_modules
+#COPY ./node_modules /opt/app/node_modules
 COPY ./package.json /opt/app/package.json
 COPY ./start.sh /opt/app/start.sh
 RUN chmod +x /opt/app/start.sh
