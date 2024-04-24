@@ -24,7 +24,10 @@ jobs:
         uses: actions/cache@v4
         with:
           save-always: true
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+              ${{ runner.os }}-yarn-
 #      - run: yarn install --frozen-lockfile
 #      - name: yarn build with env
 #        env: # Or as an environment variable
