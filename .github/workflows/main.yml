@@ -32,40 +32,6 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-#      - run: yarn install --frozen-lockfile
-#      - name: yarn build with env
-#        env: # Or as an environment variable
-#          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-#          STYTCH_PROJECT_ENV: ${{ secrets.STYTCH_PROJECT_ENV }}
-#          STYTCH_PROJECT_ID: ${{ secrets.STYTCH_PROJECT_ID }}
-#          NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN: ${{ secrets.NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN }}
-#          CUSTOMER_IO_API_KEY: ${{ secrets.CUSTOMER_IO_API_KEY }}
-#          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-#          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
-#          AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
-#          QSTASH_URL: ${{ secrets.QSTASH_URL }}
-#          QSTASH_TOKEN: ${{ secrets.QSTASH_TOKEN }}
-#          QSTASH_CURRENT_SIGNING_KEY: ${{ secrets.QSTASH_CURRENT_SIGNING_KEY }}
-#          QSTASH_NEXT_SIGNING_KEY: ${{ secrets.QSTASH_NEXT_SIGNING_KEY }}
-#          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
-#          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-#          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-#          NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID }}
-#          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
-#          PUSHER_APP_SECRET: ${{ secrets.PUSHER_APP_SECRET }}
-#          NEXT_PUBLIC_PUSHER_APP_KEY: ${{ secrets.NEXT_PUBLIC_PUSHER_APP_KEY }}
-#          NEXT_PUBLIC_PUSHER_APP_CLUSTER: ${{ secrets.NEXT_PUBLIC_PUSHER_APP_CLUSTER }}
-#          NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
-#          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-#          WHO_ICD_API_CLIENT_ID: ${{ secrets.WHO_ICD_API_CLIENT_ID }}
-#          WHO_ICD_API_CLIENT_SECRET: ${{ secrets.WHO_ICD_API_CLIENT_SECRET }}
-#          DAILY_API_KEY: ${{ secrets.DAILY_API_KEY }}
-#          DAILY_REST_DOMAIN: ${{ secrets.DAILY_REST_DOMAIN }}
-#          MESSAGEBIRD_API_KEY : ${{ secrets.MESSAGEBIRD_API_KEY  }}
-#        run: yarn build
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -97,36 +63,36 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: lunahealthapp:latest
           secrets: |
-            "DATABASE_URL=${{ secrets.DATABASE_URL }}"
-            "STYTCH_PROJECT_ENV=${{ secrets.STYTCH_PROJECT_ENV }}"
-            "STYTCH_PROJECT_ID=${{ secrets.STYTCH_PROJECT_ID }}"
-            "NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN=${{ secrets.NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN }}"
-            "CUSTOMER_IO_API_KEY=${{ secrets.CUSTOMER_IO_API_KEY }}"
-            "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}"
-            "SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}"
-            "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}"
-            "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-            "AWS_S3_REGION=${{ secrets.AWS_S3_REGION }}"
-            "AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}"
-            "QSTASH_URL=${{ secrets.QSTASH_URL }}"
-            "QSTASH_TOKEN=${{ secrets.QSTASH_TOKEN }}"
-            "QSTASH_CURRENT_SIGNING_KEY=${{ secrets.QSTASH_CURRENT_SIGNING_KEY }}"
-            "QSTASH_NEXT_SIGNING_KEY=${{ secrets.QSTASH_NEXT_SIGNING_KEY }}"
-            "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}"
-            "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}"
-            "STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}"
-            "NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID=${{ secrets.NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID }}"
-            "PUSHER_APP_ID=${{ secrets.PUSHER_APP_ID }}"
-            "PUSHER_APP_SECRET=${{ secrets.PUSHER_APP_SECRET }}"
-            "NEXT_PUBLIC_PUSHER_APP_KEY=${{ secrets.NEXT_PUBLIC_PUSHER_APP_KEY }}"
-            "NEXT_PUBLIC_PUSHER_APP_CLUSTER=${{ secrets.NEXT_PUBLIC_PUSHER_APP_CLUSTER }}"
-            "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}"
-            "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}"
-            "WHO_ICD_API_CLIENT_ID=${{ secrets.WHO_ICD_API_CLIENT_ID }}"
-            "WHO_ICD_API_CLIENT_SECRET=${{ secrets.WHO_ICD_API_CLIENT_SECRET }}"
-            "DAILY_API_KEY=${{ secrets.DAILY_API_KEY }}"
-            "DAILY_REST_DOMAIN=${{ secrets.DAILY_REST_DOMAIN }}"
-            "MESSAGEBIRD_API_KEY=${{ secrets.MESSAGEBIRD_API_KEY }}"
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            STYTCH_PROJECT_ENV=${{ secrets.STYTCH_PROJECT_ENV }}
+            STYTCH_PROJECT_ID=${{ secrets.STYTCH_PROJECT_ID }}
+            NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN=${{ secrets.NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN }}
+            CUSTOMER_IO_API_KEY=${{ secrets.CUSTOMER_IO_API_KEY }}
+            JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+            SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_S3_REGION=${{ secrets.AWS_S3_REGION }}
+            AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}
+            QSTASH_URL=${{ secrets.QSTASH_URL }}
+            QSTASH_TOKEN=${{ secrets.QSTASH_TOKEN }}
+            QSTASH_CURRENT_SIGNING_KEY=${{ secrets.QSTASH_CURRENT_SIGNING_KEY }}
+            QSTASH_NEXT_SIGNING_KEY=${{ secrets.QSTASH_NEXT_SIGNING_KEY }}
+            NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+            STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+            NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID=${{ secrets.NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID }}
+            PUSHER_APP_ID=${{ secrets.PUSHER_APP_ID }}
+            PUSHER_APP_SECRET=${{ secrets.PUSHER_APP_SECRET }}
+            NEXT_PUBLIC_PUSHER_APP_KEY=${{ secrets.NEXT_PUBLIC_PUSHER_APP_KEY }}
+            NEXT_PUBLIC_PUSHER_APP_CLUSTER=${{ secrets.NEXT_PUBLIC_PUSHER_APP_CLUSTER }}
+            NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            WHO_ICD_API_CLIENT_ID=${{ secrets.WHO_ICD_API_CLIENT_ID }}
+            WHO_ICD_API_CLIENT_SECRET=${{ secrets.WHO_ICD_API_CLIENT_SECRET }}
+            DAILY_API_KEY=${{ secrets.DAILY_API_KEY }}
+            DAILY_REST_DOMAIN=${{ secrets.DAILY_REST_DOMAIN }}
+            MESSAGEBIRD_API_KEY=${{ secrets.MESSAGEBIRD_API_KEY }}
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
