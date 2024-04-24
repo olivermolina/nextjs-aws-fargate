@@ -11,7 +11,7 @@ RUN apk add --no-cache chromium
 COPY package.json yarn.lock ./
 
 # Install dependencies
-RUN yarn install --production
+RUN yarn install --frozen-lockfile
 
 # Copy the rest of your app's source code from your host to your image filesystem.
 COPY . .
