@@ -20,6 +20,7 @@ jobs:
           node-version: 20.3.0
           cache: 'yarn'
           cache-dependency-path: 'yarn.lock'
+
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
