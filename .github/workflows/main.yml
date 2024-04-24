@@ -67,6 +67,8 @@ jobs:
           push: true
           tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
           provenance: false
+          cache-from: type=gha
+          cache-to: type=gha
           build-args: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             STYTCH_PROJECT_ENV=${{ secrets.STYTCH_PROJECT_ENV }}
@@ -136,7 +138,7 @@ jobs:
         with:
           task-definition: infra/task-definitions/service.latest.json
           container-name: lunahealthapp-image
-          image: ${{ steps.build-image.outputs.image }}
+          image: ${{ steps.docker_build.outputs.imageid }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
