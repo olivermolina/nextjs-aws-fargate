@@ -73,50 +73,14 @@ ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 ARG WHO_ICD_API_CLIENT_ID
 ENV WHO_ICD_API_CLIENT_ID=${WHO_ICD_API_CLIENT_ID}
 ARG WHO_ICD_API_CLIENT_SECRET
-ENV WHO_ICD_API_CLIENT_SECRET=${WHO_ICD_API_CLIENT_SECRET}
 ARG DAILY_API_KEY
 ENV DAILY_API_KEY=${DAILY_API_KEY}
 ARG DAILY_REST_DOMAIN
 ENV DAILY_REST_DOMAIN=${DAILY_REST_DOMAIN}
 ENV GENERATE_SOURCEMAP false
 
-RUN touch .env
-## Copy the .env.production file to the working directory
-## echo all env variables to .env.production
-RUN echo "NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN=${NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN}" >> .env.production
-RUN echo "DATABASE_URL=${DATABASE_URL}" >> .env.production
-RUN echo "STYTCH_PROJECT_ENV=${STYTCH_PROJECT_ENV}" >> .env.production
-RUN echo "STYTCH_PROJECT_ID=${STYTCH_PROJECT_ID}" >> .env.production
-RUN echo "STYTCH_SECRET=${STYTCH_SECRET}" >> .env.production
-RUN echo "CUSTOMER_IO_API_KEY=${CUSTOMER_IO_API_KEY}" >> .env.production
-RUN echo "JWT_SECRET_KEY=${JWT_SECRET_KEY}" >> .env.production
-RUN echo "NODE_ENV=${NODE_ENV}" >> .env.production
-RUN echo "SENDGRID_API_KEY=${SENDGRID_API_KEY}" >> .env.production
-RUN echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> .env.production
-RUN echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}"
-RUN echo "AWS_S3_REGION=${AWS_S3_REGION}" >> .env.production
-RUN echo "AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}" >> .env.production
-RUN echo "QSTASH_CURRENT_SIGNING_KEY=${QSTASH_CURRENT_SIGNING_KEY}" >> .env.production
-RUN echo "QSTASH_NEXT_SIGNING_KEY=${QSTASH_NEXT_SIGNING_KEY}" >> .env.production
-RUN echo "QSTASH_URL=${QSTASH_URL}" >> .env.production
-RUN echo "QSTASH_TOKEN=${QSTASH_TOKEN}" >> .env.production
-RUN echo "MESSAGEBIRD_API_KEY=${MESSAGEBIRD_API_KEY}" >> .env.production
-RUN echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}" >> .env.production
-RUN echo "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" >> .env.production
-RUN echo "STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}" >> .env.production
-RUN echo "NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID=${NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID}" >> .env.production
-RUN echo "PUSHER_APP_ID=${PUSHER_APP_ID}" >> .env.production
-RUN echo "PUSHER_APP_SECRET=${PUSHER_APP_SECRET}" >> .env.production
-RUN echo "NEXT_PUBLIC_PUSHER_APP_KEY=${NEXT_PUBLIC_PUSHER_APP_KEY}" >> .env.production
-RUN echo "NEXT_PUBLIC_PUSHER_APP_CLUSTER=${NEXT_PUBLIC_PUSHER_APP_CLUSTER}" >> .env.production
-RUN echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}" >> .env.production
-RUN echo "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}" >> .env.production
-RUN echo "WHO_ICD_API_CLIENT_ID=${WHO_ICD_API_CLIENT_ID}" >> .env.production
-RUN echo "WHO_ICD_API_CLIENT_SECRET=${WHO_ICD_API_CLIENT_SECRET}" >> .env.production
-RUN echo "DAILY_API_KEY=${DAILY_API_KEY}" >> .env.production
-RUN echo "DAILY_REST_DOMAIN=${DAILY_REST_DOMAIN}" >> .env
-
-RUN cat .env
+RUN --mount=type=secret,id=$WHO_ICD_API_CLIENT_SECRET  \
+  WHO_ICD_API_CLIENT_SECRET=$(cat /run/secrets/$WHO_ICD_API_CLIENT_SECRET )
 
 # Copy the rest of your app's source code from your host to your image filesystem.
 COPY . .
