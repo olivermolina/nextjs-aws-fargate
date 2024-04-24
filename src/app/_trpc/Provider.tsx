@@ -1,13 +1,12 @@
 'use client';
-import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { httpBatchLink, loggerLink, TRPCClientError } from '@trpc/client';
-import React, { useState } from 'react';
+import {QueryCache, QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {httpBatchLink, loggerLink, TRPCClientError} from '@trpc/client';
+import React, {useState} from 'react';
 
-import { trpc } from './client';
-import { getBaseUrl } from 'src/utils/get-base-url';
-import { trpcTransformer } from 'src/libs/trpc';
-import { useRouter } from '../../hooks/use-router';
-import { paths } from '../../paths';
+import {trpc} from './client';
+import {trpcTransformer} from 'src/libs/trpc';
+import {useRouter} from '../../hooks/use-router';
+import {paths} from '../../paths';
 
 export function isTRPCClientError(cause: unknown): cause is TRPCClientError<any> {
   return cause instanceof TRPCClientError;
@@ -54,7 +53,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
             (opts.direction === 'down' && opts.result instanceof Error),
         }),
         httpBatchLink({
-          url: `${getBaseUrl()}/api/trpc`,
+          url: `/api/trpc`,
         }),
       ],
     }),

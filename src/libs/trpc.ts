@@ -6,10 +6,10 @@ import {
   splitLink,
   TRPCLink,
 } from '@trpc/client';
-import { observable } from '@trpc/server/observable';
-import { getBaseUrl } from 'src/utils/get-base-url';
-import { AppRouter } from 'src/server';
-import type { inferProcedureInput, inferProcedureOutput } from '@trpc/server';
+import {observable} from '@trpc/server/observable';
+import {getBaseUrl} from 'src/utils/get-base-url';
+import {AppRouter} from 'src/server';
+import type {inferProcedureInput, inferProcedureOutput} from '@trpc/server';
 import superjson from 'superjson';
 
 /**
@@ -69,7 +69,7 @@ export const trpcLinks = (enableLogger = true, cookie?: string) => [
     }),
     // when condition is false, use batching
     false: httpBatchLink({
-      url: `${getBaseUrl()}/api/trpc`,
+      url: `/api/trpc`,
       ...(cookie && {
         headers: {
           Cookie: cookie,
