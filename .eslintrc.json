@@ -1,0 +1,12 @@
+{
+  "extends": ["next/core-web-vitals", "prettier"],
+  "rules": {
+    "@next/next/no-img-element": "off",
+    "@next/next/no-page-custom-font": "off",
+    "react/jsx-max-props-per-line": "off", // Changed from "error" to "off"
+    "import/newline-after-import": "error",
+    "jsx-a11y/alt-text": "off",
+    "no-unused-vars": "off",
+    "react-hooks/exhaustive-deps": "warn" // Add this to change the level to "warn"
+  }
+}

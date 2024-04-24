@@ -1,0 +1,60 @@
+# Use a specific version of the official Node.js image
+FROM node:20.12.0-alpine3.19
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Install Chromium
+RUN apk add --no-cache chromium
+
+# Copy package.json and yarn.lock to the working directory
+COPY package.json yarn.lock ./
+
+# Install dependencies
+RUN yarn install --frozen-lockfile
+
+# Copy the rest of your app's source code from your host to your image filesystem.
+COPY . .
+
+# Specify the variable you need
+ARG NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN
+ARG DATABASE_URL
+ARG STYTCH_PROJECT_ENV
+ARG STYTCH_PROJECT_ID
+ARG STYTCH_SECRET
+ARG CUSTOMER_IO_API_KEY
+ARG JWT_SECRET_KEY
+ARG NODE_ENV
+ARG SENDGRID_API_KEY
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+ARG AWS_S3_REGION
+ARG AWS_S3_BUCKET_NAME
+ARG QSTASH_CURRENT_SIGNING_KEY
+ARG QSTASH_NEXT_SIGNING_KEY
+ARG QSTASH_URL
+ARG QSTASH_TOKEN
+ARG MESSAGEBIRD_API_KEY
+ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+ARG STRIPE_SECRET_KEY
+ARG STRIPE_WEBHOOK_SECRET
+ARG NEXT_PUBLIC_STRIPE_CONNECT_CLIENT_ID
+ARG PUSHER_APP_ID
+ARG PUSHER_APP_SECRET
+ARG NEXT_PUBLIC_PUSHER_APP_KEY
+ARG NEXT_PUBLIC_PUSHER_APP_CLUSTER
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ARG GOOGLE_CLIENT_SECRET
+ARG WHO_ICD_API_CLIENT_ID
+ARG WHO_ICD_API_CLIENT_SECRET
+ARG DAILY_API_KEY
+ARG DAILY_REST_DOMAIN
+
+ENV GENERATE_SOURCEMAP=false
+
+# Build your Next.js app
+RUN yarn build
+
+# The command to run your app
+CMD ["yarn", "start"]
+

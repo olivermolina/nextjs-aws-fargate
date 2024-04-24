@@ -1,0 +1,1030 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                         String                    @id @default(auto()) @map("_id") @db.ObjectId
+  stytch_member_id           String                    @unique
+  email                      String                    @unique
+  username                   String?                   @unique
+  first_name                 String?
+  last_name                  String?
+  company                    String? // Patient Company name
+  bill_name                  String? // Name that will appear on the invoice for the patient
+  type                       UserType                  @default(STAFF)
+  role                       Role?                     @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  role_id                    String?                   @db.ObjectId
+  CustomRolePermissions      CustomRolePermission[]
+  active                     Boolean                   @default(false)
+  avatar                     String?
+  created_at                 DateTime                  @default(now())
+  updated_at                 DateTime                  @default(now()) @updatedAt
+  field                      String?
+  birthdate                  DateTime?
+  identifier                 String?
+  gender                     Gender?
+  phone                      String?
+  address                    Address?                  @relation("primary", fields: [address_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  address_id                 String?                   @db.ObjectId
+  billing_address            Address?                  @relation("billing", fields: [billing_address_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  billing_address_id         String?                   @db.ObjectId
+  Consultations              Consultation[]
+  patients                   UserStaffs[]              @relation("UserAsPatient") // Patients of the user
+  staffs                     UserStaffs[]              @relation("UserAsStaff") // Staffs of the user
+  organization               Organization              @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization_id            String                    @db.ObjectId
+  password_hash              String
+  avatar_color               String?                   @default("#A9A9A9")
+  ConsultationStaffs         ConsultationStaff[] // Staffs of the consultation
+  PatientInvoices            Invoice[]                 @relation("PatientInvoice") // Invoices for the patient
+  StaffInvoices              InvoiceStaff[] // Invoices created by the staff
+  CreatedServices            Service[]                 @relation("ServiceCreatedBy") // Services created by the user
+  Tax                        Tax?                      @relation(fields: [tax_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tax_id                     String?                   @db.ObjectId
+  abbreviation               String?                   @default("Dr.")
+  AssignServices             ServiceAssignStaff[] // Services assigned to the staff
+  Files                      File[] // Files of the user
+  Availabilities             Availability[]
+  StripeUserPaymentMethods   StripeUserPaymentMethod[]
+  messages                   Message[]
+  google_calendar_setting    GoogleCalendarSetting?    @relation(fields: [google_calendar_setting_id], references: [id])
+  google_calendar_setting_id String?                   @db.ObjectId
+  BlockedSlots               BlockedSlot[]
+  Templates                  Template[]
+  ToNotifications            Notification[]            @relation("To")
+  FromNotifications          Notification[]            @relation("From")
+  Charts                     Chart[]                   @relation("PatientChart")
+  CreatedCharts              Chart[]                   @relation("StaffChart")
+  AssignedCharts             Chart[]                   @relation("AssignedChart")
+  SignedChartCharts          Chart[]                   @relation("SignedChart")
+  quick_notes                String?
+  Allergies                  Allergy[]
+  Problems                   Problem[]
+  History                    History[]
+  Vitals                     Vital[]
+  language                   String?
+  UserLogs                   Log[]                     @relation("UserLog")
+  StaffLogs                  Log[]                     @relation("StaffLog")
+  StaffFaxes                 Fax[]                     @relation("StaffFax")
+  ChartTemplates             ChartTemplate[]
+
+  // Unique constraint for email and organization
+  @@unique([email, organization_id])
+  @@fulltext([first_name, last_name, email])
+}
+
+model UserStaffs {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  user    User   @relation(name: "UserAsStaff", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId  String @db.ObjectId
+  staff   User   @relation(name: "UserAsPatient", fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  staffId String @db.ObjectId
+
+  @@unique([userId, staffId])
+}
+
+enum UserType {
+  STAFF
+  PATIENT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model Address {
+  id                           String         @id @default(auto()) @map("_id") @db.ObjectId
+  address_line1                String
+  address_line2                String?
+  postal_code                  String
+  city                         String
+  state                        String
+  country                      String
+  UserPrimaryAddresses         User[]         @relation("primary")
+  UserBillingAddresses         User[]         @relation("billing")
+  OrganizationPrimaryAddresses Organization[] @relation("primary")
+  OrganizationBillingAddresses Organization[] @relation("billing")
+}
+
+enum Status {
+  CANCELED
+  COMPLETED
+  PENDING
+  CONFIRMED
+}
+
+model Consultation {
+  id                       String                @id @default(auto()) @map("_id") @db.ObjectId
+  user                     User                  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id                  String                @db.ObjectId
+  staffs                   ConsultationStaff[]
+  title                    String?
+  description              String
+  start_time               DateTime
+  end_time                 DateTime
+  created_at               DateTime              @default(now())
+  updated_at               DateTime              @default(now()) @updatedAt
+  diagnostic_code          String?
+  motive                   String?
+  status                   Status                @default(PENDING)
+  internal_notes           String?
+  external_notes           String?
+  transcription            String?
+  telemedicine             Boolean               @default(false)
+  service                  Service?              @relation(fields: [service_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  service_id               String?               @db.ObjectId
+  patient_notes            String?
+  appointmentReminders     AppointmentReminder[]
+  invoice                  Invoice?              @relation(fields: [invoice_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  invoice_id               String?               @db.ObjectId
+  google_calendar_event_id String?
+  notification             Notification?
+  Charts                   Chart[]
+  video_room_id            String?
+  video_call_started_at    DateTime?
+  location                 Location?             @relation(fields: [location_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  location_id              String?               @db.ObjectId
+  Logs                     Log[]
+}
+
+model ConsultationStaff {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  consultation    Consultation @relation(fields: [consultation_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  consultation_id String       @db.ObjectId
+  staff           User         @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  staff_id        String       @db.ObjectId
+
+  @@unique([consultation_id, staff_id])
+}
+
+enum AppAccess {
+  Block
+  Allow
+}
+
+model Organization {
+  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+  stytch_id          String         @unique
+  slug               String         @unique
+  name               String
+  bill_name          String? // Name that will appear on the invoice
+  size               String
+  category           String
+  code               String
+  phone              String?
+  email              String?
+  bill_email         String?
+  description        String?
+  npi                String? // National Provider Identifier
+  logo               String? // URL Logo of the organization
+  created_at         DateTime       @default(now())
+  updated_at         DateTime       @default(now()) @updatedAt
+  users              User[]
+  // Use to determine if the admin has verified the email
+  isVerified         Boolean        @default(false)
+  currency           String         @default("USD")
+  currency_symbol    String         @default("$")
+  Services           Service[] // Services of the organization
+  Tax                Tax?           @relation(fields: [tax_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tax_id             String?        @db.ObjectId
+  website            String?
+  address            Address?       @relation("primary", fields: [address_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  address_id         String?        @db.ObjectId
+  billing_address    Address?       @relation("billing", fields: [billing_address_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  billing_address_id String?        @db.ObjectId
+  // Use to determine if the organization signup is complete
+  status             Status         @default(PENDING)
+  Availabilities     Availability[]
+
+  reminders_day_before             Boolean                           @default(true)
+  reminders_hour_before            Boolean                           @default(true)
+  sms_reminders_day_before         Boolean                           @default(true)
+  sms_reminders_hour_before        Boolean                           @default(true)
+  appointment_payment_auto_capture Boolean                           @default(true)
+  appointment_auto_send_invoice    Boolean                           @default(true)
+  appointment_payment_required     Boolean                           @default(false)
+  appointment_request_enabled      Boolean                           @default(false)
+  telemedicine_auto_recording      Boolean                           @default(false)
+  StripeOrganizationPaymentMethods StripeOrganizationPaymentMethod[]
+  stripe_subscription_id           String?
+  additional_users                 Int?                              @default(0)
+  access                           AppAccess                         @default(Block)
+  StripeConnect                    StripeConnect[]
+  Templates                        Template[]
+  TemplateTag                      TemplateTag[]
+  ConfigureClinicalProfile         ConfigureClinicalProfile?
+  Locations                        Location[]
+  SRFaxSettings                    SRFaxSettings?
+  ChartTemplates                   ChartTemplate[]
+}
+
+model Invoice {
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  title           String?
+  invoice_number  String         @unique
+  assigned_number Int
+  patient         User           @relation(name: "PatientInvoice", fields: [patient_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  patient_id      String         @db.ObjectId
+  staffs          InvoiceStaff[]
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @default(now()) @updatedAt
+  due_date        DateTime
+  status          InvoiceStatus  @default(PENDING)
+  total_amount    Float
+  subtotal_amount Float
+  tax_amount      Float
+  InvoiceItems    InvoiceItem[]
+  Consultations   Consultation[]
+}
+
+enum InvoiceStatus {
+  PAID
+  PENDING
+  CANCELED
+}
+
+model InvoiceStaff {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  Invoice    Invoice @relation(fields: [invoice_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  invoice_id String  @db.ObjectId
+  Staff      User    @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  staff_id   String  @db.ObjectId
+
+  @@unique([invoice_id, staff_id])
+}
+
+model Service {
+  id              String               @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  organization    Organization         @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization_id String               @db.ObjectId
+  duration        Float
+  price           Float
+  staffs          ServiceAssignStaff[]
+  created_by      User                 @relation("ServiceCreatedBy", fields: [created_by_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  created_by_id   String               @db.ObjectId
+  created_at      DateTime             @default(now())
+  updated_at      DateTime             @default(now()) @updatedAt
+  InvoiceItems    InvoiceItem[]
+  service_color   String?              @default("#A9A9A9")
+  display_name    String?
+  description     String?
+  telemedicine    Boolean              @default(false)
+  taxable         Boolean              @default(false)
+  code            String?
+  type            String?
+  Consultations   Consultation[]
+  slug            String
+
+  @@unique([organization_id, slug])
+}
+
+model ServiceAssignStaff {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  Service    Service @relation(fields: [service_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  service_id String  @db.ObjectId
+  Staff      User    @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  staff_id   String  @db.ObjectId
+
+  @@unique([service_id, staff_id])
+}
+
+model InvoiceItem {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  invoice      Invoice  @relation(fields: [invoice_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  invoice_id   String   @db.ObjectId
+  description  String
+  service      Service? @relation(fields: [service_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  service_id   String?  @db.ObjectId
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now()) @updatedAt
+  quantity     Int
+  total_amount Float
+  unit_amount  Float
+  code         String?
+}
+
+model Tax {
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  company_number String
+  vat_number     String
+  name           String
+  percentage     Float
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @default(now()) @updatedAt
+  Users          User[]
+  Organizations  Organization[]
+}
+
+model File {
+  id                  String        @id @default(auto()) @map("_id") @db.ObjectId
+  user                User          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id             String        @db.ObjectId
+  type                String
+  name                String
+  size                Float
+  s3_key              String
+  s3_bucket           String
+  created_at          DateTime      @default(now())
+  shared_with_patient Boolean       @default(false)
+  SubFiles            SubFile[]
+  notification        Notification?
+  Logs                Log[]
+  Fax                 Fax[]
+}
+
+model SubFile {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  file         File          @relation(fields: [file_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  file_id      String        @db.ObjectId
+  type         String
+  name         String
+  size         Float
+  s3_key       String
+  s3_bucket    String
+  created_at   DateTime      @default(now())
+  notification Notification?
+  Logs         Log[]
+}
+
+model Availability {
+  id                 String             @id @default(auto()) @map("_id") @db.ObjectId
+  user               User               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id            String             @db.ObjectId
+  name               String
+  organization       Organization       @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization_id    String             @db.ObjectId
+  timezone           String
+  availability_slots AvailabilitySlot[]
+}
+
+model AvailabilitySlot {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  availability    Availability @relation(fields: [availability_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  availability_id String       @db.ObjectId
+  start_time      DateTime
+  end_time        DateTime
+  day_of_week     Int
+}
+
+enum AppointmentReminderType {
+  EMAIL
+  SMS
+}
+
+model AppointmentReminder {
+  id                 String                  @id @default(auto()) @map("_id") @db.ObjectId
+  consultation       Consultation            @relation(fields: [consultation_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  consultation_id    String                  @db.ObjectId
+  qstash_schedule_id String
+  hours_before       Int
+  created_at         DateTime                @default(now())
+  status             Status                  @default(PENDING)
+  type               AppointmentReminderType
+}
+
+model StripePaymentMethod {
+  id                               String                            @id @default(auto()) @map("_id") @db.ObjectId
+  stripe_id                        String
+  brand                            String
+  last4                            String
+  StripeUserPaymentMethods         StripeUserPaymentMethod[]
+  StripeOrganizationPaymentMethods StripeOrganizationPaymentMethod[]
+  created_at                       DateTime                          @default(now())
+  updated_at                       DateTime                          @default(now()) @updatedAt
+}
+
+model StripeUserPaymentMethod {
+  id                       String               @id @default(auto()) @map("_id") @db.ObjectId
+  stripe_customer_id       String
+  user                     User                 @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id                  String               @db.ObjectId
+  stripe_payment_method    StripePaymentMethod? @relation(fields: [stripe_payment_method_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  stripe_payment_method_id String?              @db.ObjectId
+}
+
+model StripeOrganizationPaymentMethod {
+  id                       String               @id @default(auto()) @map("_id") @db.ObjectId
+  stripe_customer_id       String
+  organization             Organization         @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization_id          String               @db.ObjectId
+  stripe_payment_method    StripePaymentMethod? @relation(fields: [stripe_payment_method_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  stripe_payment_method_id String?              @db.ObjectId
+}
+
+model StripeConnect {
+  id                     String       @id @default(auto()) @map("_id") @db.ObjectId
+  organization           Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization_id        String       @unique @db.ObjectId
+  // The Account ID
+  stripe_user_id         String
+  access_token           String?
+  refresh_token          String?
+  livemode               Boolean?
+  stripe_publishable_key String?
+  created_at             DateTime     @default(now())
+  updated_at             DateTime     @default(now()) @updatedAt
+}
+
+enum RoleName {
+  // Admin
+  ADMIN
+  // Doctor or other clinician
+  PRACTITIONER
+  // Secretary or person that works at the reception desk
+  ADMIN_STAFF
+  // Custom role if the permissions are set
+  CUSTOM
+}
+
+model Role {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  name             RoleName         @unique
+  role_permissions RolePermission[]
+  users            User[]
+}
+
+enum PermissionAction {
+  VIEW
+  EDIT
+}
+
+model Permission {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  action           PermissionAction @unique
+  role_permissions RolePermission[]
+}
+
+model Resource {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  // The name of the resource e.g.
+  // 'Patient information', 'Invoicing and payments',
+  // 'Scheduling', 'Organization settings', 'Reports`,
+  // 'Chat'
+  name             String           @unique
+  role_permissions RolePermission[]
+}
+
+enum RolePermissionLevel {
+  NONE
+  OWN
+  EVERYTHING
+}
+
+model RolePermission {
+  id            String                 @id @default(auto()) @map("_id") @db.ObjectId
+  level         RolePermissionLevel
+  role          Role                   @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  role_id       String                 @db.ObjectId
+  permission    Permission             @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission_id String                 @db.ObjectId
+  resource      Resource               @relation(fields: [resource_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  resource_id   String                 @db.ObjectId
+  custom_roles  CustomRolePermission[]
+}
+
+// Role permissions for a user if custom permissions are set
+model CustomRolePermission {
+  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+  user               User           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id            String         @db.ObjectId
+  role_permission    RolePermission @relation(fields: [role_permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  role_permission_id String         @db.ObjectId
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @default(now()) @updatedAt
+
+  @@unique([user_id, role_permission_id])
+}
+
+// Equivalent to Pusher.Channel
+model Thread {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  title          String    @unique // Channel name
+  participantIds String[] // User ids of the participants
+  messages       Message[]
+  unreadCount    Int       @default(0)
+  created_at     DateTime  @default(now())
+}
+
+model Message {
+  id            String             @id @default(auto()) @map("_id") @db.ObjectId
+  thread        Thread             @relation(fields: [thread_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  thread_id     String             @db.ObjectId
+  user          User               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id       String             @db.ObjectId
+  text          String?
+  attachment    MessageAttachment? @relation(fields: [attachment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  attachment_id String?            @db.ObjectId
+  contentType   String
+  created_at    DateTime           @default(now())
+  notification  Notification?
+}
+
+model MessageAttachment {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  type       String
+  name       String
+  size       Float
+  s3_key     String
+  s3_bucket  String
+  created_at DateTime  @default(now())
+  Message    Message[]
+}
+
+model GoogleCalendarSetting {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  email              String
+  google_calendar_id String?
+  access_token       String?
+  refresh_token      String?
+  token_type         String?
+  id_token           String?
+  scope              String?
+  push_calendar      Boolean? @default(false)
+  pull_calendar      Boolean? @default(false)
+  expiry_date        Int?
+  watch_resource_id  String?
+  watch_expiration   String?
+  watch_channel_id   String?  @unique
+  created_at         DateTime @default(now())
+  updated_at         DateTime @default(now()) @updatedAt
+  User               User[]
+}
+
+model BlockedSlot {
+  id                       String   @id @default(auto()) @map("_id") @db.ObjectId
+  google_calendar_event_id String   @unique
+  user_id                  String   @db.ObjectId
+  user                     User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  start_time               DateTime
+  end_time                 DateTime
+  reason                   String? // We set this to busy by default
+  created_at               DateTime @default(now())
+  updated_at               DateTime @default(now()) @updatedAt
+}
+
+model Template {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  description     String
+  content         String
+  tags            String[]
+  shared          String[]
+  profession      String[]
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @default(now()) @updatedAt
+  organization_id String?       @db.ObjectId
+  organization    Organization? @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  created_by_id   String?       @db.ObjectId
+  created_by      User?         @relation(fields: [created_by_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model TemplateTag {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  name            String        @unique
+  organization_id String?       @db.ObjectId
+  organization    Organization? @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  created_at      DateTime      @default(now())
+}
+
+model Notification {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  // User that the notification is sent to
+  to_user         User          @relation("To", fields: [to_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  to_user_id      String        @db.ObjectId
+  // User that the notification is sent from
+  from_user       User          @relation("From", fields: [from_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  from_user_id    String        @db.ObjectId
+  description     String
+  created_at      DateTime      @default(now())
+  read            Boolean       @default(false)
+  // Consent intake pdf file
+  SubFile         SubFile?      @relation(fields: [sub_file_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  sub_file_id     String?       @unique @db.ObjectId
+  // Uploaded file
+  File            File?         @relation(fields: [file_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  file_id         String?       @unique @db.ObjectId
+  // Consultation
+  Consultation    Consultation? @relation(fields: [consultation_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  consultation_id String?       @unique @db.ObjectId
+  // Chat messages
+  Message         Message?      @relation(fields: [message_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  message_id      String?       @unique @db.ObjectId
+  deleted         Boolean       @default(false)
+  Chart           Chart?        @relation(fields: [chart_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chart_id        String?       @unique @db.ObjectId
+}
+
+enum ChartType {
+  FREE_TEXT
+  SOAP
+}
+
+model Chart {
+  id                 String        @id @default(auto()) @map("_id") @db.ObjectId
+  user               User          @relation("PatientChart", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id            String        @db.ObjectId
+  name               String
+  created_at         DateTime      @default(now())
+  updated_at         DateTime      @default(now()) @updatedAt
+  created_by_id      String        @db.ObjectId
+  created_by         User          @relation("StaffChart", fields: [created_by_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  consultation_id    String?       @db.ObjectId
+  consultation       Consultation? @relation(fields: [consultation_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  type               ChartType     @default(FREE_TEXT)
+  service_datetime   DateTime
+  // Free text field
+  free_text          String?
+  // SOAP fields
+  subjective_text    String?
+  objective_text     String?
+  assessment_text    String?
+  plan_text          String?
+  notification       Notification?
+  assigned_to_id     String        @db.ObjectId
+  assigned_to        User          @relation("AssignedChart", fields: [assigned_to_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  signed_by          User?         @relation("SignedChart", fields: [signed_by_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  signed_by_id       String?       @db.ObjectId
+  signed_at          DateTime?
+  daily_recording_id String?
+  daily_preset       String?
+  Logs               Log[]
+  items              ChartItem[]
+  Fax                Fax[]
+
+  @@fulltext([name, free_text, subjective_text, objective_text, assessment_text, plan_text])
+}
+
+enum AllergyStatus {
+  ACTIVE
+  INACTIVE
+  RESOLVED
+}
+
+model Allergy {
+  id         String        @id @default(auto()) @map("_id") @db.ObjectId
+  user       User          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id    String        @db.ObjectId
+  name       String
+  reaction   String?
+  status     AllergyStatus @default(INACTIVE)
+  onset_date DateTime      @default(now())
+  created_at DateTime      @default(now())
+  updated_at DateTime      @default(now()) @updatedAt
+  ChartItem  ChartItem?
+}
+
+enum ProblemStatus {
+  ACTIVE
+  CONTROLLED
+  RESOLVED
+}
+
+// Patients' problems
+model Problem {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  user            User          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id         String        @db.ObjectId
+  title           String
+  synopsis        String?
+  code            String[]
+  status          ProblemStatus @default(ACTIVE)
+  diagnostic_date DateTime      @default(now())
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @default(now()) @updatedAt
+  ChartItem       ChartItem?
+}
+
+enum HistoryType {
+  FAMILY_HISTORY
+  SOCIAL_HISTORY
+  PAST_MEDICAL_HISTORY
+  PAST_SURGICAL_HISTORY
+  DIET
+  HABITS
+  EXERCISES
+  OTHER
+}
+
+enum Relationship {
+  MOTHER
+  FATHER
+  SIBLING
+  CHILD
+  MATERNAL_GRANDMOTHER
+  MATERNAL_GRANDFATHER
+  PATERNAL_GRANDMOTHER
+  PATERNAL_GRANDFATHER
+  OTHER
+}
+
+model History {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  user         User          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id      String        @db.ObjectId
+  type         HistoryType   @default(OTHER)
+  condition    String
+  relationship Relationship?
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @default(now()) @updatedAt
+  ChartItem    ChartItem?
+}
+
+model ConfigureClinicalProfile {
+  id                  String       @id @default(auto()) @map("_id") @db.ObjectId
+  quick_notes         Boolean      @default(true)
+  allergies           Boolean      @default(true)
+  problems            Boolean      @default(true)
+  medications         Boolean      @default(true)
+  vitals              Boolean      @default(true)
+  vitals_subsections  String[]
+  history             Boolean      @default(true)
+  history_subsections String[]
+  created_at          DateTime     @default(now())
+  updated_at          DateTime     @default(now()) @updatedAt
+  organization        Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization_id     String       @unique @db.ObjectId
+}
+
+enum LocationType {
+  IN_PERSON
+}
+
+model Location {
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  display_name    String
+  value           String
+  type            LocationType   @default(IN_PERSON)
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @default(now()) @updatedAt
+  organization    Organization   @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization_id String         @db.ObjectId
+  Consultations   Consultation[]
+}
+
+enum LogAction {
+  VIEW
+  EDIT
+  CREATE
+  DELETE
+}
+
+model Log {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  text            String
+  user_id         String?       @db.ObjectId
+  user            User?         @relation("UserLog", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  staff_id        String        @db.ObjectId
+  staff           User          @relation("StaffLog", fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  action          LogAction
+  chart_id        String?       @db.ObjectId
+  chart           Chart?        @relation(fields: [chart_id], references: [id])
+  consultation_id String?       @db.ObjectId
+  consultation    Consultation? @relation(fields: [consultation_id], references: [id])
+  file_id         String?       @db.ObjectId
+  file            File?         @relation(fields: [file_id], references: [id])
+  sub_file_id     String?       @db.ObjectId
+  sub_file        SubFile?      @relation(fields: [sub_file_id], references: [id])
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @default(now()) @updatedAt
+}
+
+enum ChartItemType {
+  CHIEF_COMPLAINT
+  NOTE
+  NOTE_EDITOR
+  BODY_CHART
+  SKETCH
+  FILE
+  SPINE
+  HEADING
+  CHECKBOXES
+  DROPDOWN
+  RANGE
+  VITALS
+  HISTORY
+  ALLERGY
+  PROBLEM
+}
+
+model Vital {
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  user              User       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id           String     @db.ObjectId
+  height            Float?
+  height_unit       String?
+  weight            Float?
+  weight_unit       String?
+  bmi               Float?
+  temperature       Float?
+  temperature_unit  String?
+  respiratory_rate  Int?
+  systolic          Int?
+  diastolic         Int?
+  heart_rate        Int?
+  oxygen_saturation Int?
+  date              DateTime   @default(now())
+  created_at        DateTime   @default(now())
+  updated_at        DateTime   @default(now()) @updatedAt
+  ChartItem         ChartItem?
+}
+
+model ChiefComplaint {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  value     String?
+  ChartItem ChartItem?
+}
+
+model ChartNote {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  label     String?
+  value     String?
+  ChartItem ChartItem?
+}
+
+model ChartNoteEditor {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  label     String?
+  value     String?
+  ChartItem ChartItem?
+}
+
+model ChartDropdown {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  label     String?
+  prompt    String?
+  options   String[]
+  value     String?
+  ChartItem ChartItem?
+}
+
+model BodyChart {
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  label             String?
+  points            Json?
+  canvas            String?
+  background_s3_key String?
+  ChartItem         ChartItem?
+}
+
+model ChartCheckBox {
+  id                           String     @id @default(auto()) @map("_id") @db.ObjectId
+  label                        String?
+  layout                       String
+  options                      String[]
+  value                        Json?
+  include_note                 Boolean?
+  hide_unchecked_after_signing Boolean?
+  required                     Boolean?
+  ChartItem                    ChartItem?
+}
+
+model ChartRange {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  label         String?
+  default_value String?
+  options       String[]
+  value         String?
+  ChartItem     ChartItem?
+}
+
+model ChartSpine {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  label     String?
+  value     Json?
+  canvas    String?
+  notes     String?
+  ChartItem ChartItem?
+}
+
+model ChartSketch {
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  label             String?
+  canvas            String?
+  background_s3_key String?
+  ChartItem         ChartItem?
+}
+
+model ChartHeading {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  value     String?
+  ChartItem ChartItem?
+}
+
+model ChartFile {
+  id               String     @id @default(auto()) @map("_id") @db.ObjectId
+  label            String?
+  file_s3_key      String?
+  file_description String?
+  file_name        String?
+  file_type        String?
+  ChartItem        ChartItem?
+}
+
+model ChartItem {
+  id                   String           @id @default(auto()) @map("_id") @db.ObjectId
+  chart_id             String           @db.ObjectId
+  chart                Chart            @relation(fields: [chart_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  order                Int
+  type                 ChartItemType
+  vital_id             String?          @unique @db.ObjectId
+  Vital                Vital?           @relation(fields: [vital_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chart_note_id        String?          @unique @db.ObjectId
+  ChartNote            ChartNote?       @relation(fields: [chart_note_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ChartNoteEditor      ChartNoteEditor? @relation(fields: [chart_note_editor_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chart_note_editor_id String?          @unique @db.ObjectId
+  chief_complaint_id   String?          @unique @db.ObjectId
+  ChiefComplaint       ChiefComplaint?  @relation(fields: [chief_complaint_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  body_chart_id        String?          @unique @db.ObjectId
+  BodyChart            BodyChart?       @relation(fields: [body_chart_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chart_check_box_id   String?          @unique @db.ObjectId
+  ChartCheckBox        ChartCheckBox?   @relation(fields: [chart_check_box_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chart_range_id       String?          @unique @db.ObjectId
+  ChartRange           ChartRange?      @relation(fields: [chart_range_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chart_spine_id       String?          @unique @db.ObjectId
+  ChartSpine           ChartSpine?      @relation(fields: [chart_spine_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chart_dropdown_id    String?          @unique @db.ObjectId
+  ChartDropdown        ChartDropdown?   @relation(fields: [chart_dropdown_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chart_sketch_id      String?          @unique @db.ObjectId
+  ChartSketch          ChartSketch?     @relation(fields: [chart_sketch_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chart_heading_id     String?          @unique @db.ObjectId
+  ChartHeading         ChartHeading?    @relation(fields: [chart_heading_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ChartFile            ChartFile?       @relation(fields: [chart_file_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chart_file_id        String?          @unique @db.ObjectId
+  History              History?         @relation(fields: [history_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  history_id           String?          @unique @db.ObjectId
+  Allergy              Allergy?         @relation(fields: [allergy_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  allergy_id           String?          @unique @db.ObjectId
+  Problem              Problem?         @relation(fields: [problem_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  problem_id           String?          @unique @db.ObjectId
+  created_at           DateTime         @default(now())
+  updated_at           DateTime         @default(now()) @updatedAt
+}
+
+model Fax {
+  id                      String   @id @default(auto()) @map("_id") @db.ObjectId
+  recipient_first_name    String
+  recipient_last_name     String
+  to_number               String
+  recipient_business_name String?
+  staff                   User     @relation("StaffFax", fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  staff_id                String   @db.ObjectId
+  status                  String
+  status_message          String?
+  file                    File?    @relation(fields: [file_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  file_id                 String?  @db.ObjectId
+  chart                   Chart?   @relation(fields: [chart_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chart_id                String?  @db.ObjectId
+  created_at              DateTime @default(now())
+  updated_at              DateTime @default(now()) @updatedAt
+  include_cover_sheet     Boolean  @default(false)
+  subject                 String?
+  remarks                 String?
+  include_header_per_page Boolean? @default(false)
+  attachments             Json?
+  account_code            String?
+  // sent or received
+  action                  String
+  // SR Fax Details
+  fax_details_id          String?
+  srfax_file_name         String?
+  srfax_sent_status       String?
+  srfax_error_code        String?
+  srfax_size              Int?
+  srfax_pages             Int?
+}
+
+model SRFaxSettings {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  organization    Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization_id String       @unique @db.ObjectId
+  account_number  String
+  fax_number      String
+  access_token    String
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @default(now()) @updatedAt
+}
+
+model ChartTemplate {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  items           Json?
+  shared          String[]
+  organization_id String       @db.ObjectId
+  organization    Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  created_by_id   String       @db.ObjectId
+  created_by      User         @relation(fields: [created_by_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @default(now()) @updatedAt
+}
