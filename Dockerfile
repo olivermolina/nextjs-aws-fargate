@@ -1,22 +1,12 @@
 # Use a specific version of the official Node.js image
 FROM node:20.12.0-alpine3.19
 
-# Set the working directory in the container
 RUN mkdir -p /opt/app
 
 WORKDIR /opt/app
 
 # Install Chromium
 RUN apk add --no-cache chromium
-
-# Copy package.json and yarn.lock to the working directory
-COPY package.json yarn.lock ./
-
-# Install dependencies
-RUN yarn install --frozen-lockfile
-
-# Copy the rest of your app's source code from your host to your image filesystem.
-COPY . .
 
 # Specify the variable you need
 ARG NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN
@@ -89,9 +79,6 @@ ENV NODE_ENV production
 ENV PORT 80
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Build your Next.js app
-RUN yarn build
-
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
@@ -99,7 +86,7 @@ RUN adduser -S nextjs -u 1001
 #COPY /app/next.config.js ./
 COPY ./public /opt/app/public
 COPY --chown=nextjs:nodejs ./.next /opt/app/.next
-#COPY ./node_modules /opt/app/node_modules
+COPY ./node_modules /opt/app/node_modules
 COPY ./package.json /opt/app/package.json
 COPY ./start.sh /opt/app/start.sh
 RUN chmod +x /opt/app/start.sh
@@ -108,5 +95,4 @@ USER nextjs
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# The command to run your app
 ENTRYPOINT ["/opt/app/start.sh"]

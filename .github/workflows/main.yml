@@ -13,8 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install & Build
-        uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20.3.0
@@ -32,6 +30,12 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+
+      - name: Install & Build
+        uses: actions/checkout@v4
+      - run: yarn install --frozen-lockfile
+      - run: yarn build && yarn install --production --ignore-scripts --prefer-offline
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
