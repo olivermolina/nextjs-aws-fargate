@@ -14,7 +14,10 @@ jobs:
 
     steps:
       - name: Install & Build
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.3.0
       - run: yarn install --frozen-lockfile
       - run: yarn build && yarn install --production --ignore-scripts --prefer-offline
 
