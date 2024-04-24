@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 20.3.0
       - run: yarn install --frozen-lockfile
-      - run: yarn build
+      - name: yarn build with env
         env: # Or as an environment variable
           NODE_ENV: ${{ secrets.NODE_ENV }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -51,7 +51,7 @@ jobs:
           WHO_ICD_API_CLIENT_SECRET: ${{ secrets.WHO_ICD_API_CLIENT_SECRET }}
           DAILY_API_KEY: ${{ secrets.DAILY_API_KEY }}
           DAILY_REST_DOMAIN: ${{ secrets.DAILY_REST_DOMAIN }}
-
+        run: yarn build
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
