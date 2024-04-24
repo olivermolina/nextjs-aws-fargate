@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 20.3.0
       - run: yarn install --frozen-lockfile
-      - run: yarn build && yarn install --production --ignore-scripts --prefer-offline
+      - run: yarn build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
