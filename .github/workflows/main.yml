@@ -163,7 +163,7 @@ jobs:
         with:
           task-definition: infra/task-definitions/service.latest.json
           container-name: lunahealthapp-image
-          image: ${{ steps.docker_build.outputs.imageid }}
+          image: ${{ steps.docker_build.outputs.metadata.image.name }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
