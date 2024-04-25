@@ -92,7 +92,7 @@ ENV DAILY_REST_DOMAIN=${DAILY_REST_DOMAIN}
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV GENERATE_SOURCEMAP=false
 
-RUN yarn run build
+RUN yarn build
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -118,6 +118,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 
 EXPOSE 80
+
+ENV HOSTNAME="0.0.0.0"
 
 ENV PORT 80
 
