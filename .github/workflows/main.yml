@@ -90,7 +90,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} , ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
           provenance: false
           cache-from: type=gha
           cache-to: type=gha
@@ -160,10 +160,13 @@ jobs:
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: web/lunahealthapp
         with:
           task-definition: infra/task-definitions/service.latest.json
           container-name: lunahealthapp-image
-          image: ${{ steps.docker_build.outputs.metadata["image.name"] }}
+          image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
