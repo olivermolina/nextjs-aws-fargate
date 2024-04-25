@@ -89,7 +89,7 @@ ENV DAILY_REST_DOMAIN=${DAILY_REST_DOMAIN}
 
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV GENERATE_SOURCEMAP=false
-ENV PORT 80
+ENV PORT 3000
 ENV HOSTNAME="0.0.0.0"
 ENV NODE_ENV production
 
@@ -117,7 +117,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-EXPOSE 80
+EXPOSE 3000
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
