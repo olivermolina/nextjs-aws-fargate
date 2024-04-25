@@ -38,8 +38,6 @@ ARG CUSTOMER_IO_API_KEY
 ENV CUSTOMER_IO_API_KEY=${CUSTOMER_IO_API_KEY}
 ARG JWT_SECRET_KEY
 ENV JWT_SECRET_KEY=${JWT_SECRET_KEY}
-ARG NODE_ENV
-ENV NODE_ENV=${NODE_ENV}
 ARG SENDGRID_API_KEY
 ENV SENDGRID_API_KEY=${SENDGRID_API_KEY}
 ARG AWS_ACCESS_KEY_ID
@@ -91,6 +89,9 @@ ENV DAILY_REST_DOMAIN=${DAILY_REST_DOMAIN}
 
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV GENERATE_SOURCEMAP=false
+ENV PORT 80
+ENV HOSTNAME="0.0.0.0"
+ENV NODE_ENV production
 
 RUN yarn build
 
@@ -98,7 +99,6 @@ RUN yarn build
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN addgroup --system --gid 1001 nodejs
@@ -118,10 +118,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 
 EXPOSE 80
-
-ENV HOSTNAME="0.0.0.0"
-
-ENV PORT 80
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output

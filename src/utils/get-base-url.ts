@@ -17,6 +17,9 @@ export function getBaseUrl() {
     return 'https://admin.lunahealth.app';
   }
 
+  const hostname = process.env.HOSTNAME ?? "localhost";
+  const port = process.env.PORT ?? 3000;
+
   // assume localhost
-  return `http://localhost:${process.env.PORT ?? 3000}`;
+  return `http://${hostname}:${port}`;
 }
