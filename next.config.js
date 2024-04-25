@@ -4,6 +4,7 @@ const { env } = require('./src/server/env');
 
 /** @type {import('next').NextConfig} */
 const config = {
+  output: 'standalone',
   serverRuntimeConfig: {
     DATABASE_URL: env.DATABASE_URL,
     STYTCH_PROJECT_ENV: env.STYTCH_PROJECT_ENV,
