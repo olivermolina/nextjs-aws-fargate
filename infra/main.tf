@@ -156,8 +156,8 @@ resource "aws_kms_key" "default" {
     deletion_window_in_days = 10
 }
 
-resource "aws_ssm_parameter" "db_password" {
-    name        = "/web/${var.project_id}/database/secret"
+resource "aws_ssm_parameter" "ssm_lunahealthapp" {
+    name        = "/web/${var.project_id}"
     description = "Database password"
     type        = "SecureString"
     key_id      = aws_kms_key.default.key_id
@@ -213,7 +213,7 @@ data "template_file" "task_def_generated" {
   template = "${file("./task-definitions/service.json.tpl")}"
   vars = {
       ecs_execution_role  = module.ecs_roles.ecs_execution_role_arn
-      ssm_db_password_arn = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter${aws_ssm_parameter.db_password.name}"
+      ssm_arn = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter${aws_ssm_parameter.ssm_lunahealthapp.name}"
   }
 }
 
