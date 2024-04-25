@@ -34,8 +34,100 @@
       },
       "secrets": [
         {
-          "name": "DATABASE_PASSWORD",
-          "valueFrom": "arn:aws:ssm:ca-central-1:963168360796:parameter/web/lunahealthapp/database/secret"
+          "name": "STYTCH_PROJECT_ENV",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "STYTCH_PROJECT_ID",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "STYTCH_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "CUSTOMER_IO_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "JWT_SECRET_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "SENDGRID_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "AWS_ACCESS_KEY_ID",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "AWS_SECRET_ACCESS_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "AWS_S3_REGION",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "AWS_S3_BUCKET_NAME",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "QSTASH_URL",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "QSTASH_TOKEN",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "QSTASH_CURRENT_SIGNING_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "QSTASH_NEXT_SIGNING_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "MESSAGEBIRD_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "STRIPE_SECRET_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "STRIPE_WEBHOOK_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "PUSHER_APP_ID",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "PUSHER_APP_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "GOOGLE_CLIENT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "WHO_ICD_API_CLIENT_ID",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "WHO_ICD_API_CLIENT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "DAILY_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
+        },
+        {
+          "name": "DAILY_REST_DOMAIN",
+          "valueFrom": "arn:aws:secretsmanager:ca-central-1:963168360796:secret:web/lunahealthapp-7OakYZ"
         }
       ]
     }
